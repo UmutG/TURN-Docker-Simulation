@@ -2,10 +2,10 @@ FROM ubuntu:latest
 MAINTAINER Umut Geyik <umut.geyik-b@tubitak.gov.tr>
 
 
-# Working Directory -> /server
+# Working Directory -> /client
 WORKDIR /client
 
-# Copy Contents -> /server
+# Copy Contents -> /client
 ADD . /client
 
 EXPOSE 3478
