@@ -1,0 +1,97 @@
+version: "3.8"
+
+services:
+  ubuntuclient1:
+    image: umutgyk/ubuntuclient
+    cap_add:
+      - NET_ADMIN
+    hostname: ubuntuclient1
+    networks:
+      gateway1-internal:
+        ipv4_address: 172.18.0.3
+    command: >-
+      sh -c "ip route del default &&
+      ip route add default via 172.18.0.2 &&
+      tail -f /dev/null"
+
+  gateway1:
+    image: umutgyk/ubuntuclient
+    cap_add:
+      - NET_ADMIN
+    hostname: gateway1
+    networks:
+      gateway1-internal:
+        ipv4_address: 172.18.0.2
+      mybridge:
+        ipv4_address: 172.20.0.3
+    command: >-
+      sh -c "iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE &&
+      iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE &&
+      iptables -A FORWARD -i eth1 -j ACCEPT &&
+      iptables -A FORWARD -i eth0 -j ACCEPT &&
+      ip route add 172.19.0.0/16 via 172.20.0.2 &&
+      tail -f /dev/null"
+
+
+  gateway2:
+    image: umutgyk/ubuntuclient
+    cap_add:
+      - NET_ADMIN
+    hostname: gateway2
+    networks:
+      gateway2-internal:
+        ipv4_address: 172.19.0.2
+      mybridge:
+        ipv4_address: 172.20.0.4
+    command: >-
+      sh -c "iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE &&
+      iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE &&
+      iptables -A FORWARD -i eth1 -j ACCEPT &&
+      iptables -A FORWARD -i eth0 -j ACCEPT &&
+      ip route add 172.18.0.0/16 via 172.20.0.2 &&
+      tail -f /dev/null"
+
+  ubuntuclient2:
+    image: umutgyk/ubuntuclient
+    cap_add:
+      - NET_ADMIN
+    hostname: ubuntuclient2
+    networks:
+      gateway2-internal:
+        ipv4_address: 172.19.0.3
+    command: >-
+      sh -c "ip route del default &&
+      ip route add default via 172.19.0.2 &&
+      tail -f /dev/null"
+
+  turnserver:
+    image: umutgyk/turnserver
+    cap_add:
+      - NET_ADMIN
+    hostname: turnserver
+    networks:
+      mybridge:
+        ipv4_address: 172.20.0.2
+    ports:
+      - "3478:3478/tcp"
+      - "3478:3478/udp"
+    restart: always
+    command: >-
+      sh -c "turnadmin -a -u $turnuser -p $userpwd -r $realm && bash deploy-turnserver.sh $realm"
+      
+networks:
+  gateway1-internal:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
+  gateway2-internal:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.19.0.0/16
+  mybridge:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
