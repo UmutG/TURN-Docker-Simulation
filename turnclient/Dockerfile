@@ -12,6 +12,7 @@ EXPOSE 3478
 
 RUN apt-get update && apt-get upgrade -y && apt-get install apt-utils -y \
     iproute2 \
+    tcpdump \
     dnsutils \
     iputils-ping \
     iptables \
