@@ -10,7 +10,10 @@ services:
       gateway1-internal:
         ipv4_address: 172.18.0.3
     command: >-
-      sh -c "ip route del default &&
+      sh -c "iptables -A OUTPUT -p all -j ACCEPT &&
+      iptables -A INPUT -p all -j ACCEPT &&
+      iptables -A FORWARD -p all -j ACCEPT &&
+      ip route del default &&
       ip route add default via 172.18.0.2 &&
       tail -f /dev/null"
 
@@ -25,10 +28,14 @@ services:
       mybridge:
         ipv4_address: 172.20.0.3
     command: >-
-      sh -c "iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE &&
-      iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE &&
-      iptables -A FORWARD -i eth1 -j ACCEPT &&
-      iptables -A FORWARD -i eth0 -j ACCEPT &&
+      sh -c "iptables -t nat -A POSTROUTING -o eth0 -p all -j MASQUERADE &&
+      iptables -t nat -A POSTROUTING -o eth1 -p all -j MASQUERADE &&
+      iptables -A FORWARD -i eth1 -p all -j ACCEPT &&
+      iptables -A FORWARD -i eth0 -p all -j ACCEPT &&
+      iptables -A INPUT -i eth1 -p all -j ACCEPT &&
+      iptables -A INPUT -i eth0 -p all -j ACCEPT &&
+      iptables -A OUTPUT -o eth1 -p all -j ACCEPT &&
+      iptables -A OUTPUT -o eth0 -p all -j ACCEPT &&
       ip route add 172.19.0.0/16 via 172.20.0.2 &&
       tail -f /dev/null"
 
@@ -44,10 +51,14 @@ services:
       mybridge:
         ipv4_address: 172.20.0.4
     command: >-
-      sh -c "iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE &&
-      iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE &&
-      iptables -A FORWARD -i eth1 -j ACCEPT &&
-      iptables -A FORWARD -i eth0 -j ACCEPT &&
+      sh -c "iptables -t nat -A POSTROUTING -o eth0 -p all -j MASQUERADE &&
+      iptables -t nat -A POSTROUTING -o eth1 -p all -j MASQUERADE &&
+      iptables -A FORWARD -i eth1 -p all -j ACCEPT &&
+      iptables -A FORWARD -i eth0 -p all -j ACCEPT &&
+      iptables -A INPUT -i eth1 -p all -j ACCEPT &&
+      iptables -A INPUT -i eth0 -p all -j ACCEPT &&
+      iptables -A OUTPUT -o eth1 -p all -j ACCEPT &&
+      iptables -A OUTPUT -o eth0 -p all -j ACCEPT &&
       ip route add 172.18.0.0/16 via 172.20.0.2 &&
       tail -f /dev/null"
 
@@ -60,8 +71,27 @@ services:
       gateway2-internal:
         ipv4_address: 172.19.0.3
     command: >-
-      sh -c "ip route del default &&
+      sh -c "iptables -A OUTPUT -p all -j ACCEPT &&
+      iptables -A INPUT -p all -j ACCEPT &&
+      iptables -A FORWARD -p all -j ACCEPT &&
+      ip route del default &&
       ip route add default via 172.19.0.2 &&
+      tail -f /dev/null"
+  
+  ubuntuclient3:
+    image: umutgyk/ubuntuclient
+    cap_add:
+      - NET_ADMIN
+    hostname: ubuntuclient3
+    networks:
+      mybridge:
+        ipv4_address: 172.20.0.5
+    command: >-
+      sh -c "iptables -A OUTPUT -p all -j ACCEPT &&
+      iptables -A INPUT -p all -j ACCEPT &&
+      iptables -A FORWARD -p all -j ACCEPT &&
+      ip route del default &&
+      ip route add default via 172.20.0.2 &&
       tail -f /dev/null"
 
   turnserver:
@@ -75,9 +105,20 @@ services:
     ports:
       - "3478:3478/tcp"
       - "3478:3478/udp"
+      - "3479:3479/tcp"
+      - "3479:3479/udp"
+      - "80:80/tcp"
+      - "80:80/udp"
+      - "443:443/tcp"
+      - "443:443/udp"
     restart: always
     command: >-
-      sh -c "turnadmin -a -u $turnuser -p $userpwd -r $realm && bash deploy-turnserver.sh $realm"
+      sh -c "apt update && apt install iptables -y &&
+      iptables -A FORWARD -i eth0 -p all -j ACCEPT &&
+      iptables -A INPUT -i eth0 -p all -j ACCEPT &&
+      iptables -A OUTPUT -o eth0 -p all -j ACCEPT &&
+      turnadmin -a -u $turnuser -p $userpwd -r $realm && 
+      bash deploy-turnserver.sh $realm"
       
 networks:
   gateway1-internal:
