@@ -8,7 +8,7 @@ WORKDIR /server
 # Copy Contents -> /server
 ADD . /server
 
-EXPOSE 3478/tcp
+EXPOSE 3478/udp, 3478/tcp
 
 RUN apt-get update && apt-get upgrade -y && apt-get install apt-utils -y \
     sqlite \
