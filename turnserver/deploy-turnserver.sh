@@ -9,13 +9,13 @@ external-ip="$externalIp"
 realm=$1
 server-name=$1
 lt-cred-mech
-mobility
+verbose
 userdb=/var/lib/turn/turndb
 # use real-valid certificate/privatekey files
 cert=/etc/ssl/turn_server_cert.pem
 pkey=/etc/ssl/turn_server_pkey.pem
-no-stdout-log" | tee /etc/turnserver.conf
+#no-stdout-log" | tee /etc/turnserver.conf
 
 turnserver
 
-echo "TURN server is running. IP => "$externalIp" "
+echo "TURN server running. IP => "$externalIp" "
