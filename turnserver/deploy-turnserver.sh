@@ -18,4 +18,4 @@ no-stdout-log" | tee /etc/turnserver.conf
 
 turnserver
 
-echo "TURN server running. IP => "$externalIp" "
+echo "TURN server is running. IP => "$externalIp" "
