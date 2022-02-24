@@ -1,7 +1,6 @@
 FROM ubuntu:latest
 MAINTAINER Umut Geyik <umut.geyik-b@tubitak.gov.tr>
 
-
 # Working Directory -> /client
 WORKDIR /client
 
