@@ -8,8 +8,6 @@ WORKDIR /client
 # Copy Contents -> /client
 ADD . /client
 
-EXPOSE 3478
-
 RUN apt-get update && apt-get upgrade -y && apt-get install apt-utils -y \
     iproute2 \
     tcpdump \
