@@ -1,7 +1,6 @@
 FROM ubuntu:16.04
 MAINTAINER Umut Geyik <umut.geyik-b@tubitak.gov.tr>
 
-
 # Working Directory -> /server
 WORKDIR /server
 
@@ -16,6 +15,7 @@ EXPOSE 80/tcp
 EXPOSE 80/udp
 EXPOSE 443/tcp
 EXPOSE 443/udp
+EXPOSE 1025-65300
 
 RUN apt-get update && apt-get upgrade -y && apt-get install apt-utils -y \
     iptables \
