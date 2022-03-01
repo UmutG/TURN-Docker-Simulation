@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:latest
 MAINTAINER Umut Geyik <umut.geyik-b@tubitak.gov.tr>
 
 # Working Directory -> /server
@@ -7,18 +7,11 @@ WORKDIR /server
 # Copy Contents -> /server
 ADD . /server
 
-EXPOSE 3478/udp
-EXPOSE 3478/tcp
-EXPOSE 3479/udp
-EXPOSE 3479/udp
-EXPOSE 80/tcp
-EXPOSE 80/udp
-EXPOSE 443/tcp
-EXPOSE 443/udp
-EXPOSE 1025-65300
+EXPOSE 3478/udp 3478/tcp 3479/udp 3479/udp 80/tcp 80/udp 443/tcp 443/udp
 
 RUN apt-get update && apt-get upgrade -y && apt-get install apt-utils -y \
     iptables \
+    iproute2 \
     tcpdump \
     net-tools \
     sqlite \
