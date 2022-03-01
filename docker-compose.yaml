@@ -30,6 +30,8 @@ services:
     command: >-
       sh -c "iptables -t nat -A POSTROUTING -o eth0 -p all -j MASQUERADE --random &&
       iptables -t nat -A POSTROUTING -o eth1 -p all -j MASQUERADE --random &&
+      iptables -t nat -A PREROUTING -p tcp --dport 0:65535 -i eth0 -j DNAT --to-destination 172.18.0.3 &&
+      iptables -t nat -A PREROUTING -p udp --dport 0:65535 -i eth0 -j DNAT --to-destination 172.18.0.3 &&
       iptables -A FORWARD -i eth1 -p all -j ACCEPT &&
       iptables -A FORWARD -i eth0 -p all -j ACCEPT &&
       iptables -A INPUT -i eth1 -p all -j ACCEPT &&
@@ -53,6 +55,8 @@ services:
     command: >-
       sh -c "iptables -t nat -A POSTROUTING -o eth0 -p all -j MASQUERADE --random &&
       iptables -t nat -A POSTROUTING -o eth1 -p all -j MASQUERADE --random &&
+      iptables -t nat -A PREROUTING -p tcp --dport 0:65535 -i eth0 -j DNAT --to-destination 172.19.0.3 &&
+      iptables -t nat -A PREROUTING -p udp --dport 0:65535 -i eth0 -j DNAT --to-destination 172.19.0.3 &&
       iptables -A FORWARD -i eth1 -p all -j ACCEPT &&
       iptables -A FORWARD -i eth0 -p all -j ACCEPT &&
       iptables -A INPUT -i eth1 -p all -j ACCEPT &&
@@ -105,7 +109,7 @@ services:
     restart: always
     command: >-
       sh -c "iptables -A FORWARD -i eth0 -p all -j ACCEPT &&
-      turnadmin -a -u $turnuser -p $userpwd -r $realm && 
+      turnadmin -a -u $turnuser -p $userpwd -r $realm -b "/usr/share/coturn/turnuserdb.conf" && 
       bash deploy-turnserver.sh $realm"
       
 networks:
