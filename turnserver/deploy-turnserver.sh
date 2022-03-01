@@ -6,11 +6,13 @@ tls-listening-port=5349
 listening-ip="$internalIp"
 relay-ip="$internalIp"
 external-ip="$externalIp"
+
 realm=$1
 server-name=$1
 lt-cred-mech
+
 verbose
-userdb=/var/lib/turn/turndb
+userdb=/usr/share/coturn/turnuserdb.conf
 # use real-valid certificate/privatekey files
 # cert=/etc/ssl/turn_server_cert.pem
 # pkey=/etc/ssl/turn_server_pkey.pem
