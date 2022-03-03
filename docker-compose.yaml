@@ -26,7 +26,8 @@ services:
       mybridge:
         ipv4_address: 172.20.0.3
     command: >-
-      sh -c "iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE --random &&
+      sh -c "iptables --flush &&
+      iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE --random &&
       iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE --random &&
       iptables -A FORWARD -i eth1 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT &&
       iptables -A FORWARD -i eth0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT &&
@@ -47,7 +48,8 @@ services:
       mybridge:
         ipv4_address: 172.20.0.4
     command: >-
-      sh -c "iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE --random &&
+      sh -c "iptables --flush &&
+      iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE --random &&
       iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE --random &&
       iptables -A FORWARD -i eth1 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT &&
       iptables -A FORWARD -i eth0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT &&
@@ -64,7 +66,8 @@ services:
       gateway2-internal:
         ipv4_address: 172.19.0.3
     command: >-
-      sh -c "iptables -A OUTPUT -p all -j ACCEPT &&
+      sh -c "iptables --flush &&
+      iptables -A OUTPUT -p all -j ACCEPT &&
       iptables -A INPUT -p all -j ACCEPT &&
       iptables -A FORWARD -p all -j ACCEPT &&
       ip route del default &&
