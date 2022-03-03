@@ -5,18 +5,16 @@ services:
     image: umutgyk/ubuntuclient
     cap_add:
       - NET_ADMIN
-    hostname: ubuntuclient1
+    hostname: ubuntuclient
     networks:
       gateway1-internal:
         ipv4_address: 172.18.0.3
     command: >-
-      sh -c "iptables -A OUTPUT -p all -j ACCEPT &&
-      iptables -A INPUT -p all -j ACCEPT &&
-      iptables -A FORWARD -p all -j ACCEPT &&
+      sh -c "
       ip route del default &&
       ip route add default via 172.18.0.2 &&
       tail -f /dev/null"
-
+      
   gateway1:
     image: umutgyk/ubuntuclient
     cap_add:
@@ -28,16 +26,12 @@ services:
       mybridge:
         ipv4_address: 172.20.0.3
     command: >-
-      sh -c "iptables -t nat -A POSTROUTING -o eth0 -p all -j MASQUERADE --random &&
-      iptables -t nat -A POSTROUTING -o eth1 -p all -j MASQUERADE --random &&
-      iptables -t nat -A PREROUTING -p tcp --dport 0:65535 -i eth0 -j DNAT --to-destination 172.18.0.3 &&
-      iptables -t nat -A PREROUTING -p udp --dport 0:65535 -i eth0 -j DNAT --to-destination 172.18.0.3 &&
+      sh -c "iptables -t nat -A POSTROUTING -o eth0 -p all -j MASQUERADE &&
+      iptables -t nat -A POSTROUTING -o eth1 -p all -j MASQUERADE &&
       iptables -A FORWARD -i eth1 -p all -j ACCEPT &&
       iptables -A FORWARD -i eth0 -p all -j ACCEPT &&
-      iptables -A INPUT -i eth1 -p all -j ACCEPT &&
-      iptables -A INPUT -i eth0 -p all -j ACCEPT &&
-      iptables -A OUTPUT -o eth1 -p all -j ACCEPT &&
-      iptables -A OUTPUT -o eth0 -p all -j ACCEPT &&
+      ip route del default &&
+      ip route add default via 172.18.0.2 &&
       ip route add 172.19.0.0/16 via 172.20.0.2 &&
       tail -f /dev/null"
 
@@ -53,16 +47,10 @@ services:
       mybridge:
         ipv4_address: 172.20.0.4
     command: >-
-      sh -c "iptables -t nat -A POSTROUTING -o eth0 -p all -j MASQUERADE --random &&
-      iptables -t nat -A POSTROUTING -o eth1 -p all -j MASQUERADE --random &&
-      iptables -t nat -A PREROUTING -p tcp --dport 0:65535 -i eth0 -j DNAT --to-destination 172.19.0.3 &&
-      iptables -t nat -A PREROUTING -p udp --dport 0:65535 -i eth0 -j DNAT --to-destination 172.19.0.3 &&
+      sh -c "iptables -t nat -A POSTROUTING -o eth0 -p all -j MASQUERADE &&
+      iptables -t nat -A POSTROUTING -o eth1 -p all -j MASQUERADE &&
       iptables -A FORWARD -i eth1 -p all -j ACCEPT &&
       iptables -A FORWARD -i eth0 -p all -j ACCEPT &&
-      iptables -A INPUT -i eth1 -p all -j ACCEPT &&
-      iptables -A INPUT -i eth0 -p all -j ACCEPT &&
-      iptables -A OUTPUT -o eth1 -p all -j ACCEPT &&
-      iptables -A OUTPUT -o eth0 -p all -j ACCEPT &&
       ip route add 172.18.0.0/16 via 172.20.0.2 &&
       tail -f /dev/null"
 
@@ -71,13 +59,14 @@ services:
     cap_add:
       - NET_ADMIN
     hostname: ubuntuclient2
+    
     networks:
       gateway2-internal:
         ipv4_address: 172.19.0.3
     command: >-
       sh -c "iptables -A OUTPUT -p all -j ACCEPT &&
       iptables -A INPUT -p all -j ACCEPT &&
-      iptables -A FORWARD -p all -j ACCEPT &&
+      iptables -A FORWARD -p all -j A	CCEPT &&
       ip route del default &&
       ip route add default via 172.19.0.2 &&
       tail -f /dev/null"
@@ -91,9 +80,7 @@ services:
       mybridge:
         ipv4_address: 172.20.0.5
     command: >-
-      sh -c "iptables -A OUTPUT -p all -j ACCEPT &&
-      iptables -A INPUT -p all -j ACCEPT &&
-      iptables -A FORWARD -p all -j ACCEPT &&
+      sh -c "
       ip route del default &&
       ip route add default via 172.20.0.2 &&
       tail -f /dev/null"
@@ -102,7 +89,21 @@ services:
     image: umutgyk/turnserver
     cap_add:
       - NET_ADMIN
-    hostname: turnserver
+    ports:
+# STUN/TURN
+      - "3478:3478"
+      - "3478:3478/udp"
+      - "3479:3479"
+      - "3479:3479/udp"
+      - "80:80"
+      - "80:80/udp"
+# STUN/TURN SSL
+      - "5349:5349"
+      - "5349:5349/udp"
+      - "5350:5350"
+      - "5350:5350/udp"
+      - "443:443"
+      - "443:443/udp"
     networks:
       mybridge:
         ipv4_address: 172.20.0.2
@@ -110,7 +111,7 @@ services:
     command: >-
       sh -c "iptables -A FORWARD -i eth0 -p all -j ACCEPT &&
       turnadmin -a -u $turnuser -p $userpwd -r $realm -b "/usr/share/coturn/turnuserdb.conf" && 
-      bash deploy-turnserver.sh $realm"
+      bash deploy-turnserver.sh $realm -L 127.0.0.1 -L ::1 -E 127.0.0.1 -E ::1"
       
 networks:
   gateway1-internal:
