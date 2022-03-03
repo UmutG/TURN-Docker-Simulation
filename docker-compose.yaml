@@ -26,10 +26,10 @@ services:
       mybridge:
         ipv4_address: 172.20.0.3
     command: >-
-      sh -c "iptables -t nat -A POSTROUTING -o eth0 -p all -j MASQUERADE &&
-      iptables -t nat -A POSTROUTING -o eth1 -p all -j MASQUERADE &&
-      iptables -A FORWARD -i eth1 -p all -j ACCEPT &&
-      iptables -A FORWARD -i eth0 -p all -j ACCEPT &&
+      sh -c "iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE --random &&
+      iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE --random &&
+      iptables -A FORWARD -i eth1 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT &&
+      iptables -A FORWARD -i eth0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT &&
       ip route del default &&
       ip route add default via 172.18.0.2 &&
       ip route add 172.19.0.0/16 via 172.20.0.2 &&
@@ -47,10 +47,10 @@ services:
       mybridge:
         ipv4_address: 172.20.0.4
     command: >-
-      sh -c "iptables -t nat -A POSTROUTING -o eth0 -p all -j MASQUERADE &&
-      iptables -t nat -A POSTROUTING -o eth1 -p all -j MASQUERADE &&
-      iptables -A FORWARD -i eth1 -p all -j ACCEPT &&
-      iptables -A FORWARD -i eth0 -p all -j ACCEPT &&
+      sh -c "iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE --random &&
+      iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE --random &&
+      iptables -A FORWARD -i eth1 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT &&
+      iptables -A FORWARD -i eth0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT &&
       ip route add 172.18.0.0/16 via 172.20.0.2 &&
       tail -f /dev/null"
 
@@ -66,7 +66,7 @@ services:
     command: >-
       sh -c "iptables -A OUTPUT -p all -j ACCEPT &&
       iptables -A INPUT -p all -j ACCEPT &&
-      iptables -A FORWARD -p all -j A	CCEPT &&
+      iptables -A FORWARD -p all -j ACCEPT &&
       ip route del default &&
       ip route add default via 172.19.0.2 &&
       tail -f /dev/null"
@@ -110,6 +110,7 @@ services:
     restart: always
     command: >-
       sh -c "iptables -A FORWARD -i eth0 -p all -j ACCEPT &&
+      iptables -A FORWARD -i eth1 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT &&
       turnadmin -a -u $turnuser -p $userpwd -r $realm -b "/usr/share/coturn/turnuserdb.conf" && 
       bash deploy-turnserver.sh $realm -L 127.0.0.1 -L ::1 -E 127.0.0.1 -E ::1"
       
