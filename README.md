@@ -12,3 +12,4 @@ Download .env and docker-compose.yaml files in the same directory. Run the follo
 ```
 docker-compose --env-file .env up
 ```
+Containers will be created and you can see the steps on the screen. After that, you can switch between containers.
