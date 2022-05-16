@@ -17,4 +17,3 @@ To check reflexive IP address, switch on to the desired client and type:
 ```
 turnutils_natdiscovery -m 172.20.0.2
 ```
-So, you can see that actually NAT is working.
