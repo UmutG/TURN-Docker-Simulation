@@ -7,7 +7,7 @@ This project is based on Docker images with virtual environment. Aim of this pro
 Please commit or report any improvement or bug. 
 
 **Installation:**
-Download .env and docker-compose.yaml files in the same directory. Run the following command:
+Download .env and docker-compose.yaml files in the same directory. Go to that directory and run the following command:
 
 ```
 docker-compose --env-file .env up
