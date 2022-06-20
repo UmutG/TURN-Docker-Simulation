@@ -1,5 +1,5 @@
 FROM ubuntu:latest
-MAINTAINER Umut Geyik <umut.geyik@tubitak.gov.tr>
+MAINTAINER Umut Geyik <umut.geyik@hotmail.com>
 
 # Working Directory -> /client
 WORKDIR /client
