@@ -17,3 +17,4 @@ To check reflexive IP address, switch on to the desired client and type:
 ```
 turnutils_natdiscovery -m 172.20.0.2
 ```
+***Attention:*** Do not forget to change variables inside the .env file.
